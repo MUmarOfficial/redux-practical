@@ -1,7 +1,10 @@
 import './Loader.css';
 const Loader = () => {
   return (
-    <div className='lds-roller'><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+    <div id="preloader">
+      <div className="loading-bar"></div>
+      <p className="loading-text">Loading...</p>
+    </div>
   )
 }
 

@@ -1,18 +1,15 @@
 import { Link } from "react-router-dom";
-import { FormEventHandler, useEffect, useState } from "react";
-import { Contact } from "../types";
-import { createContact, deleteContact, getContacts } from "../api/contactsApi";
+import { FormEventHandler, useEffect } from "react";
+import { createContact, deleteContact } from "../api/contactsApi";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { getContactsThunk, selectContactsList } from "../store/contactsSlice";
 
 const ContactsPage = () => {
-  const [contacts, setContacts] = useState<Contact[]>([]);
-
-  const getContactsFromServer = async () => {
-    const contactsFromServer = await getContacts();
-    setContacts(contactsFromServer);
-  }
+  const contacts = useAppSelector(selectContactsList)
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
-    getContactsFromServer();
+    dispatch(getContactsThunk());
   }, []);
 
 
