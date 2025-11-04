@@ -1,8 +1,7 @@
 import { Link } from "react-router-dom";
 import { FormEventHandler, useEffect } from "react";
-import { createContact, deleteContact } from "../api/contactsApi";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
-import { getContactsThunk, selectContactsList } from "../store/contactsSlice";
+import { createContactsThunk, deleteContactThunk, getContactsThunk, selectContactsList } from "../store/contactsSlice";
 
 const ContactsPage = () => {
   const contacts = useAppSelector(selectContactsList)
@@ -24,17 +23,17 @@ const ContactsPage = () => {
       throw new Error('First name, last name, and email are required');
     }
 
-    createContact({
+    dispatch(createContactsThunk({
       name: {
         first,
         last
       },
       email
-    }).then((contact) => {
-      setContacts(contactItems => ([contact, ...contactItems]))
+    })).unwrap().then(() => {
       target.reset();
-    })
-  }
+    });
+
+  };
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -131,14 +130,16 @@ const ContactsPage = () => {
                       </Link>
                     </td>
                     <th>
-                      <button onClick={async () => {
+                      <button onClick={() => {
                         const result = confirm('Confirm deletion of this contact.');
                         if (!result) {
                           return;
                         }
-                        await deleteContact(contact.login.uuid);
-                        setContacts(contactItems => contactItems.filter(item => item.login.uuid !== contact.login.uuid))
-                      }} className="btn btn-outline btn-error btn-xs">
+                        dispatch(deleteContactThunk(contact.login.uuid));
+                      }
+                      }
+                        className="btn btn-outline btn-error btn-xs"
+                      >
                         delete
                       </button>
                     </th>

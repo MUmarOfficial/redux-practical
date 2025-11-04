@@ -45,8 +45,8 @@
 }
 
 @keyframes move-anime {
-    0% { transform: translateX(-150vw) scaleX(1); }
-    50% { transform: translateX(0) scaleX(1); }
+    0% { transform: translateX(-90vw) scaleX(1); }
+    50% { transform: translateX(10vw) scaleX(1); }
     100% { transform: translateX(150vw) scaleX(-1); }
 }
 
