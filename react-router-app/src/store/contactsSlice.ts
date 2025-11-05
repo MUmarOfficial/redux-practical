@@ -1,6 +1,11 @@
 import { AsyncThunk, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { Contact } from "../types";
-import { createContact, deleteContact, getContactById, getContacts } from "../api/contactsApi";
+import {
+  createContact,
+  deleteContact,
+  getContactById,
+  getContacts,
+} from "../api/contactsApi";
 import { RootState } from "./store";
 
 interface ContactsState {
@@ -15,11 +20,11 @@ const initialState: ContactsState = {
   apiCallInProgress: false,
 };
 
-// type GenericAsyncThunk = AsyncThunk<unknown, unknown, { rejectValue: unknown }>
+type GenericAsyncThunk = AsyncThunk<unknown, unknown, { rejectValue: unknown }>;
 
-// type pendingThunk = ReturnType<GenericAsyncThunk["pending"]>;
-// type rejectedThunk = ReturnType<GenericAsyncThunk["rejected"]>;
-// type fulfilledThunk = ReturnType<GenericAsyncThunk["fulfilled"]>;
+type PendingAction = ReturnType<GenericAsyncThunk["pending"]>;
+type RejectedAction = ReturnType<GenericAsyncThunk["rejected"]>;
+type FulfilledAction = ReturnType<GenericAsyncThunk["fulfilled"]>;
 
 export const getContactsThunk = createAsyncThunk(
   "contacts/getContacts",
@@ -59,48 +64,39 @@ const contactsSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(getContactsThunk.pending, (state) => {
-        state.apiCallInProgress = true;
-      })
       .addCase(getContactsThunk.fulfilled, (state, action) => {
         state.items = action.payload;
-        state.apiCallInProgress = false;
-      })
-      .addCase(getContactsThunk.rejected, (state) => {
-        state.apiCallInProgress = false;
-      })
-      .addCase(createContactsThunk.pending, (state) => {
-        state.apiCallInProgress = true;
       })
       .addCase(createContactsThunk.fulfilled, (state, action) => {
         state.items.unshift(action.payload);
-        state.apiCallInProgress = false;
-      })
-      .addCase(createContactsThunk.rejected, (state) => {
-        state.apiCallInProgress = false;
-      })
-      .addCase(deleteContactThunk.pending, (state) => {
-        state.apiCallInProgress = true;
       })
       .addCase(deleteContactThunk.fulfilled, (state, action) => {
         state.items = state.items.filter(
           (item) => item.login.uuid !== action.payload.login.uuid
         );
-        state.apiCallInProgress = false;
-      })
-      .addCase(deleteContactThunk.rejected, (state) => {
-        state.apiCallInProgress = false;
-      })
-      .addCase(getContactByIdThunk.pending, (state) => {
-        state.apiCallInProgress = true;
       })
       .addCase(getContactByIdThunk.fulfilled, (state, action) => {
         state.openedContact = action.payload;
-        state.apiCallInProgress = false;
       })
-      .addCase(getContactByIdThunk.rejected, (state) => {
-        state.apiCallInProgress = false;
-      });
+      .addMatcher(
+        (action): action is PendingAction => action.type.endsWith("/pending"),
+        (state) => {
+          state.apiCallInProgress = true;
+        }
+      )
+      .addMatcher(
+        (action): action is FulfilledAction =>
+          action.type.endsWith("/fulfilled"),
+        (state) => {
+          state.apiCallInProgress = false;
+        }
+      )
+      .addMatcher(
+        (action): action is RejectedAction => action.type.endsWith("/rejected"),
+        (state) => {
+          state.apiCallInProgress = false;
+        }
+      );
   },
 });
 
